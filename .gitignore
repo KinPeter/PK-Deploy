@@ -1,0 +1,9 @@
+# dependencies
+node_modules/
+
+# production config file
+pk-deploy.config.js
+
+# temporary folders
+deploy-temp/
+dist/

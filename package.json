@@ -1,0 +1,21 @@
+{
+  "name": "pk-deploy",
+  "version": "1.0.0",
+  "description": "ftp deploy cli tool",
+  "main": "pk-deploy.js",
+  "scripts": {
+    "start": "node pk-deploy.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KinPeter/PK-Deploy"
+  },
+  "keywords": [
+    "ftp", "deploy", "node", "CLI"
+  ],
+  "author": "Peter Kin",
+  "license": "ISC",
+  "dependencies": {
+    "basic-ftp": "^4.5.3"
+  }
+}
