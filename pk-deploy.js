@@ -6,6 +6,7 @@ const logger = {
   def: str => { console.log(str) }
 };
 let config;
+let ftpError = false;
 
 try {
   config = require('./pk-deploy.config.js');
@@ -56,9 +57,6 @@ const deleteFolderRecursive = function (path) {
       await client.downloadTo(`deploy-temp/${file}`, file);
     }
 
-    // config.foldersToKeep.forEach(async (folder) => {  });
-    // config.filesToKeep.forEach(async (file) => {  });
-
     await client.clearWorkingDir();
 
     for (folder of config.foldersToKeep) {
@@ -68,24 +66,24 @@ const deleteFolderRecursive = function (path) {
       await client.uploadFrom(`deploy-temp/${file}`, file);
     }
 
-    // config.foldersToKeep.forEach(async (folder) => { await client.uploadFromDir(`deploy-temp/${folder}`, folder) });
-    // config.filesToKeep.forEach(async (file) => { await client.uploadFrom(`deploy-temp/${file}`, file) });
-
     await client.uploadFromDir(config.distDir);
 
     logger.green('[+] Deployment completed successfully.');
   }
-  catch (err) {
+  catch (error) {
     logger.red('[-] Failed to finish deployment.');
-    logger.red(err);
+    logger.red(error);
+    ftpError = true;
   }
 
   client.close();
 
-  try {
-    deleteFolderRecursive('deploy-temp');
-    logger.green('[+] Deleted temporary folder.');
-  } catch (error) {
-    logger.red('[-] Unable to delete temporary folder, please delete them manually.');
+  if (!ftpError) {
+    try {
+      deleteFolderRecursive('deploy-temp');
+      logger.green('[+] Deleted temporary folder.');
+    } catch (error) {
+      logger.red('[-] Unable to delete temporary folder, please delete them manually.');
+    }
   }
 })();
