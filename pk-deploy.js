@@ -48,10 +48,31 @@ const deleteFolderRecursive = function (path) {
       secure: config.secure
     });
     await client.cd(config.workDir);
-    await client.downloadToDir('deploy-temp/.well-known', '.well-known');
+
+    for (folder of config.foldersToKeep) {
+      await client.downloadToDir(`deploy-temp/${folder}`, folder);
+    }
+    for (file of config.filesToKeep) {
+      await client.downloadTo(`deploy-temp/${file}`, file);
+    }
+
+    // config.foldersToKeep.forEach(async (folder) => {  });
+    // config.filesToKeep.forEach(async (file) => {  });
+
     await client.clearWorkingDir();
-    await client.uploadFromDir('deploy-temp/.well-known', '.well-known');
+
+    for (folder of config.foldersToKeep) {
+      await client.uploadFromDir(`deploy-temp/${folder}`, folder);
+    }
+    for (file of config.filesToKeep) {
+      await client.uploadFrom(`deploy-temp/${file}`, file);
+    }
+
+    // config.foldersToKeep.forEach(async (folder) => { await client.uploadFromDir(`deploy-temp/${folder}`, folder) });
+    // config.filesToKeep.forEach(async (file) => { await client.uploadFrom(`deploy-temp/${file}`, file) });
+
     await client.uploadFromDir(config.distDir);
+
     logger.green('[+] Deployment completed successfully.');
   }
   catch (err) {
