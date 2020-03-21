@@ -1,6 +1,5 @@
 const ftp = require('basic-ftp');
 const fs = require('fs');
-const cp = require('child_process');
 const logger = {  
   red: str => { console.log('\x1b[31m%s\x1b[0m', str); },
   green: str => { console.log('\x1b[32m%s\x1b[0m', str); },
@@ -15,6 +14,21 @@ try {
   logger.red('[-] Please specify the FTP connection parameters in a pk-deploy.config.js file in your project root directory.');
   process.exit(0);
 }
+
+const deleteFolderRecursive = function (path) {
+  // thx to https://geedew.com/remove-a-directory-that-is-not-empty-in-nodejs/
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach(function (file, index) {
+      const curPath = path + "/" + file;
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
 
 (async function () {
   const isDistExists = fs.existsSync(config.distDir);
@@ -48,7 +62,7 @@ try {
   client.close();
 
   try {
-    cp.execSync('rm -rf deploy-temp');
+    deleteFolderRecursive('deploy-temp');
     logger.green('[+] Deleted temporary folder.');
   } catch (error) {
     logger.red('[-] Unable to delete temporary folder, please delete them manually.');
